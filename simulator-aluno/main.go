@@ -2,15 +2,32 @@ package main
 
 import (
 	"fmt"
-	route2 "github.com/alyleite/imersaofsfc2-simulator/application/route"
+	kafka2 "github.com/alyleite/imersaofsfc2-simulator/application/kafka"
+	"github.com/alyleite/imersaofsfc2-simulator/infra/kafka"
+	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/joho/godotenv"
+	"log"
 )
 
-func main() {
-	route := route2.Route{
-		ID:       "1",
-		ClientID: "1",
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("error loading .env file")
 	}
-	route.LoadPositions()
-	stringjson, _ := route.ExportJsonPositions()
-	fmt.Println(stringjson[1])
+}
+func main() {
+	//producer := kafka.NewKafkaProducer()
+	//kafka.Publish("Olá", "readtest", producer)
+	//for {
+	//	_ = 1
+	//}
+
+	msgChan := make(chan *ckafka.Message)
+	consumer := kafka.NewKafkaConsumer(msgChan)
+	go consumer.Consume()
+	for msg := range msgChan {
+		fmt.Println(string(msg.Value))
+		go kafka2.Produce(msg)
+	}
+
 }

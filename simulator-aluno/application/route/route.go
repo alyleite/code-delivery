@@ -26,6 +26,11 @@ type PartialRoutePosition struct {
 	Finished bool      `json:"finished"`
 }
 
+// NewRoute creates a *Route struct
+func NewRoute() *Route {
+	return &Route{}
+}
+
 func (r *Route) LoadPositions() error {
 	if r.ID == "" {
 		return errors.New("route id not informed")
